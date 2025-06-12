@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Add Review - {{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <h2 class="text-danger mb-4">Add a Review for <strong>{{ product.name }}</strong></h2>
+
+  {% if errors %}
+    <div class="alert alert-danger">
+      <ul>
+        {% for field, error in errors.items %}
+          <li><strong>{{ field|capfirst }}:</strong> {{ error }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <form method="POST" action="{% url 'add_review' product.id %}">
+    {% csrf_token %}
+
+    <div class="mb-3">
+      <label for="rating" class="form-label">Your Rating (1 to 5):</label>
+      <input type="number" id="rating" name="rating" class="form-control" min="1" max="5" value="{{ rating|default:'5' }}" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="description" class="form-label">Comment:</label>
+      <textarea id="description" name="description" class="form-control" rows="4" required>{{ description|default:'' }}</textarea>
+    </div>
+
+    <button type="submit" class="btn btn-danger">Submit Review</button>
+    <a href="{% url 'product_detail' product.id %}" class="btn btn-secondary ms-2">Cancel</a>
+  </form>
+</div>
+{% endblock %}

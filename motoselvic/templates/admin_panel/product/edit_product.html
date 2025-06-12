@@ -1,0 +1,231 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% load static %}
+{% block title %}Edit Product{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="card bg-dark text-white mx-auto" style="max-width: 700px;">
+    <div class="card-header btn-darkred d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">Edit Product: {{ product.name }}</h4>
+      <a href="{% url 'admin_product_management' %}" class="btn btn-outline-light btn-sm fw-semibold">← Back to Products</a>
+    </div>
+    <div class="card-body">
+      
+      <a href="{% url 'admin_manage_product_images' product.id %}" class="btn btn-info mb-4">Manage Product Images</a>
+
+      {% if form.errors %}
+      <div class="alert alert-danger">
+        <ul class="mb-0">
+          {% for field in form %}
+            {% for error in field.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <form method="POST" enctype="multipart/form-data" id="editProductForm">
+        {% csrf_token %}
+
+        <!-- Name, Description, Manufacturer -->
+        <div class="mb-3">
+          <label for="name" class="form-label">Product Name</label>
+          <input type="text" id="name" name="name" class="form-control custom-input" value="{{ product.name }}" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="description" class="form-label">Description</label>
+          <textarea id="description" name="description" class="form-control custom-input" rows="4" required>{{ product.description }}</textarea>
+        </div>
+
+        <div class="mb-3">
+          <label for="manufacturer" class="form-label">Manufacturer</label>
+          <select name="manufacturer" id="manufacturer" class="form-select custom-select" required>
+            {% for manufacturer in manufacturers %}
+              <option value="{{ manufacturer.id }}" {% if manufacturer.id == product.manufacturer.id %}selected{% endif %}>{{ manufacturer.manufacturer_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Category & Subcategory -->
+        <div class="mb-3">
+          <label for="categorySelect" class="form-label">Category</label>
+          <select name="category" id="categorySelect" class="form-select custom-select">
+            {% for cat in categories %}
+              <option value="{{ cat.id }}" {% if product.subcategory.category.id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="subcategorySelect" class="form-label">Subcategory</label>
+          <select name="subcategory" id="subcategorySelect" class="form-select custom-select">
+            {% for sub in subcategories %}
+              <option value="{{ sub.id }}" data-category="{{ sub.category.id }}" {% if product.subcategory.id == sub.id %}selected{% endif %}>{{ sub.sub_category_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Bike Company & Model -->
+        <div class="mb-3">
+          <label for="bike_company" class="form-label">Bike Company</label>
+          <select name="bike_company" id="bike_company" class="form-select custom-select">
+            <option value="">-- Select Bike Company --</option>
+            {% for company in bike_companies %}
+              <option value="{{ company.id }}" {% if product.bike_company and company.id == product.bike_company.id %}selected{% endif %}>{{ company.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="bike_model" class="form-label">Bike Model</label>
+          <select name="bike_model" id="bike_model" class="form-select custom-select">
+            <option value="" disabled {% if not product.bike_model %}selected{% endif %}>-- Select Bike Model --</option>
+            {% for bike in bike_models %}
+              <option value="{{ bike.id }}" data-company="{{ bike.company_name.id }}"
+                {% if product.bike_model and bike.id == product.bike_model.id %}selected{% endif %}>
+                {{ bike.model_name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Pricing -->
+        <div class="mb-3">
+          <label for="mrp" class="form-label">MRP</label>
+          <input type="number" id="mrp" name="mrp" class="form-control custom-input" step="0.01" value="{{ product.mrp }}" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="price" class="form-label">Actual Price</label>
+          <input type="number" id="price" name="price" class="form-control custom-input" value="{{ product.price }}" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="quantity" class="form-label">Quantity</label>
+          <input type="number" id="quantity" name="quantity" class="form-control custom-input" value="{{ product.stock }}" required>
+        </div>
+
+        <!-- Status -->
+        <div class="form-check mb-3">
+          <input type="checkbox" id="is_active" name="is_active" class="form-check-input" {% if product.is_active %}checked{% endif %}>
+          <label for="is_active" class="form-check-label">Active</label>
+        </div>
+
+        <div class="form-check mb-3">
+          <input type="checkbox" id="is_trending" name="is_trending" class="form-check-input" {% if product.is_trending %}checked{% endif %}>
+          <label for="is_trending" class="form-check-label">Trending</label>
+        </div>
+
+        <div class="form-check mb-3">
+          <input type="checkbox" id="is_newarrived" name="is_newarrived" class="form-check-input" {% if product.is_newarrived %}checked{% endif %}>
+          <label for="is_newarrived" class="form-check-label">New Arrived</label>
+        </div>
+
+        <!-- Colors & Sizes -->
+        <div class="mb-3">
+          <label for="colors" class="form-label">Colors (select multiple)</label>
+          <select id="colors" name="colors" class="form-select custom-select" multiple size="5">
+            {% for color in colors %}
+              <option value="{{ color.id }}" {% if color in product.colors.all %}selected{% endif %}>{{ color.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <p>Product colors: {% for c in product.colors.all %}{{ c.name }}{% if not forloop.last %}, {% endif %}{% empty %}No colors{% endfor %}</p>
+
+        <div class="mb-3">
+          <label for="sizes" class="form-label">Sizes (select multiple)</label>
+          <select id="sizes" name="sizes" class="form-select custom-select" multiple size="5">
+            {% for size in sizes %}
+              <option value="{{ size.id }}" {% if size in product.sizes.all %}selected{% endif %}>{{ size.size }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <p>Product sizes: {% for s in product.sizes.all %}{{ s.size }}{% if not forloop.last %}, {% endif %}{% empty %}No sizes{% endfor %}</p>
+
+        <div class="d-flex justify-content-between">
+          <button type="submit" class="btn btn-success">Update Changes</button>
+          <a href="{% url 'admin_product_management' %}" class="btn btn-outline-light">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Styling -->
+<style>
+  .custom-input {
+    background-color: #dee2e6 !important;
+    color: #000 !important;
+  }
+
+  .custom-select {
+    background-color: #dee2e6 !important;
+    color: #000 !important;
+  }
+
+  .btn-darkred {
+    background-color: #8B0000 !important;
+    color: #fff !important;
+    border: none !important;
+  }
+
+  .btn-darkred:hover {
+    background-color: #a80000 !important;
+  }
+</style>
+
+<!-- Script for Subcategory and Bike Model Filtering -->
+<script>
+  const categorySelect = document.getElementById('categorySelect');
+  const subcategorySelect = document.getElementById('subcategorySelect');
+  const bikeCompanySelect = document.getElementById('bike_company');
+  const bikeModelSelect = document.getElementById('bike_model');
+
+  function filterSubcategories() {
+    const selectedCategoryId = categorySelect.value;
+    for (let option of subcategorySelect.options) {
+      const catId = option.getAttribute('data-category');
+      option.hidden = catId !== selectedCategoryId;
+    }
+
+    // Reset subcategory if current is hidden
+    if (subcategorySelect.selectedOptions[0].hidden) {
+      for (let option of subcategorySelect.options) {
+        if (!option.hidden) {
+          subcategorySelect.value = option.value;
+          break;
+        }
+      }
+    }
+  }
+
+  function filterBikeModels() {
+    const selectedCompanyId = bikeCompanySelect.value;
+    for (let option of bikeModelSelect.options) {
+      if (!option.value) {
+        option.hidden = false; // placeholder stays visible
+        option.disabled = false;
+        continue;
+      }
+      option.hidden = option.getAttribute('data-company') !== selectedCompanyId;
+      option.disabled = option.hidden;
+    }
+
+    if (bikeModelSelect.selectedOptions.length > 0 && bikeModelSelect.selectedOptions[0].hidden) {
+      bikeModelSelect.value = "";
+    }
+  }
+
+  categorySelect.addEventListener('change', filterSubcategories);
+  bikeCompanySelect.addEventListener('change', filterBikeModels);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    filterSubcategories();
+    filterBikeModels();
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+  <h3 class="mb-4">{{ title }}</h3>
+  <form method="post" class="row g-3">
+    {% csrf_token %}
+    <div class="col-md-6">
+      <label class="form-label">First Name</label>
+      <input type="text" name="first_name" class="form-control" value="{{ address.first_name|default:'' }}" required>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Last Name</label>
+      <input type="text" name="last_name" class="form-control" value="{{ address.last_name|default:'' }}" required>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Phone</label>
+      <input type="text" name="phone" class="form-control" value="{{ address.phone|default:'' }}" required>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Email</label>
+      <input type="email" name="email" class="form-control" value="{{ address.email|default:'' }}" required>
+    </div>
+    <div class="col-12">
+      <label class="form-label">Address Line</label>
+      <textarea name="address_line" class="form-control" rows="2" required>{{ address.address_line|default:'' }}</textarea>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Landmark (optional)</label>
+      <input type="text" name="landmark" class="form-control" value="{{ address.landmark|default:'' }}">
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">City</label>
+      <input type="text" name="city" class="form-control" value="{{ address.city|default:'' }}" required>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">State</label>
+      <input type="text" name="state" class="form-control" value="{{ address.state|default:'' }}" required>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Country</label>
+      <input type="text" name="country" class="form-control" value="{{ address.country|default:'' }}" required>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Pincode</label>
+      <input type="text" name="pincode" class="form-control" value="{{ address.pincode|default:'' }}" required>
+    </div>
+    <div class="col-md-6 d-flex align-items-center">
+      <div class="form-check mt-4">
+        <input type="checkbox" name="is_default" class="form-check-input" id="isDefaultCheck" {% if address.is_default %}checked{% endif %}>
+        <label class="form-check-label" for="isDefaultCheck">Set as Default</label>
+      </div>
+    </div>
+    <div class="col-12">
+      <button type="submit" class="btn btn-danger">{{ button_label }}</button>
+      <a href="{% url 'user_dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

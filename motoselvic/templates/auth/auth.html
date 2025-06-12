@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication</title>
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="card {% if request.GET.form == 'signup' %}flipped{% endif %}">
+            <!-- Sign In Side -->
+            <div class="card-front">
+                <h2>Sign In</h2>
+                {% if messages %}
+                {% for message in messages %}
+                {% if 'login' in message.tags %}
+                <p class="alert alert-danger {{ message.tags }}">{{ message|safe }}</p>
+                {% endif %}
+                {% endfor %}
+                {% endif %}
+
+                <form method="POST" action="{% url 'signin' %}">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="email" name="email" placeholder="Email" required>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" name="password" placeholder="Password" required>
+                    </div>
+                    <div class="remember-me">
+                        <input type="checkbox" name="remember_me"> <label>Remember Me</label>
+                    </div>
+                    <button type="submit">Login</button>
+                </form>
+                <div class="forgot-password">
+                    <p>Forgot your password? <a href="{% url 'forgot_password' %}">Reset here</a></p>
+                </div>
+                <div class="toggle-link">
+                    <p onclick="flipCard()">Don't have an account? <a href="javascript:void(0)">Sign Up</a></p>
+                </div>
+            </div>
+
+            <!-- Sign Up Side -->
+            <div class="card-back">
+                <h2>Sign Up</h2>
+                {% if messages %}
+                {% for message in messages %}
+                {% if message.tags == 'signup' %}
+                <p class="{{ message.tags }}">{{ message }}</p>
+                {% endif %}
+                {% endfor %}
+                {% endif %}
+                <form method="POST" action="{% url 'signup' %}">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text" name="username" placeholder="Username" required>
+                    </div>
+                    <div class="input-group">
+                        <input type="email" name="email" placeholder="Email" required>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" name="password" placeholder="Password" required>
+                    </div>
+                    <button type="submit">Sign Up</button>
+                </form>
+                <div class="toggle-link">
+                    <p onclick="flipCard()">Already have an account? <a href="javascript:void(0)">Sign In</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function flipCard() {
+            document.querySelector(".card").classList.toggle("flipped");
+        }
+    </script>
+</body>
+
+</html>

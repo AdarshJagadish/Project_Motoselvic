@@ -1,0 +1,15 @@
+<!-- templates/admin_panel/size/add_size.html -->
+{% include 'admin_panel/admin_base.html' %}
+
+<div class="container mt-5 text-white">
+    <h2 class="mb-4 text-danger">Add New Size</h2>
+    <form method="POST" class="bg-dark p-4 rounded shadow">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="size">Size</label>
+            <input type="text" name="size" id="size" class="form-control" placeholder="Enter size (e.g. M, L, XL)">
+        </div>
+        <button type="submit" class="btn btn-danger mt-3">Add Size</button>
+        <a href="{% url 'admin_manage_sizes' %}" class="btn btn-secondary mt-3">Cancel</a>
+    </form>
+</div>

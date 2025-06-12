@@ -1,0 +1,59 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% load static %}
+{% block title %}Manage Manufacturers{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="card bg-dark text-white mx-auto" style="max-width: 1000px;">
+    <div class="card-header bg-danger d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">Manufacturers</h4>
+      <a href="{% url 'admin_add_manufacturer' %}" class="btn btn-darkred btn-sm fw-semibold">+ Add Manufacturer</a>
+    </div>
+    <div class="card-body">
+      {% if manufacturers %}
+      <div class="table-responsive">
+        <table class="table table-dark table-bordered table-hover align-middle mb-0">
+          <thead class="table-danger text-dark">
+            <tr>
+              <th style="width: 5%;">#</th>
+              <th>Name</th>
+              <th style="width: 20%;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for manufacturer in manufacturers %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ manufacturer.manufacturer_name }}</td>
+              <td>
+                <a href="{% url 'admin_edit_manufacturer' manufacturer.id %}" class="btn btn-outline-light btn-sm me-2 mb-1">Edit</a>
+                <form action="{% url 'admin_delete_manufacturer' manufacturer.id %}" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this manufacturer?');">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline-danger btn-sm mb-1">Delete</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <p class="text-muted mb-0">No manufacturers found.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .btn-darkred {
+    background-color: #007df1 !important;
+    color: #fff !important;
+    border: none !important;
+  }
+
+  .btn-darkred:hover {
+    background-color: #2e2c2c !important;
+    color: #ffffff !important;
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motoselvic - Home</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">Motoselvic</div>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/products/">Shop</a>
+            <a href="/about/">About Us</a>
+            <a href="/contact/">Contact</a>
+        </nav>
+        <div class="icons">
+            <a href="/cart/"><i class="fa fa-shopping-cart"></i></a>
+            <a href="/profile/"><i class="fa fa-user"></i></a>
+        </div>
+    </header>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+        <input type="text" placeholder="Search for products..." aria-label="Search">
+        <button type="submit">Search</button>
+    </div>
+
+    <!-- Carousel -->
+    <div class="carousel">
+        <img src="path/to/carousel-image.jpg" alt="Carousel Image">
+    </div>
+
+    <!-- Categories Section -->
+    <div class="filters">
+        <select name="category" id="category">
+            <option value="">All Categories</option>
+            {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="sort" id="sort">
+            <option value="price_asc">Price: Low to High</option>
+            <option value="price_desc">Price: High to Low</option>
+            <option value="newest">Newest</option>
+        </select>
+    </div>
+
+    <!-- Bike Brands (Companies) Section -->
+    <div class="section">
+        <h3>Featured Bike Brands</h3>
+        <div class="brands">
+            {% for company in companies %}
+            <div class="brand">
+                <img src="{{ company.logo.url }}" alt="{{ company.name }}">
+                <h4>{{ company.name }}</h4>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Product Listings -->
+    <div class="section">
+        <h3>Featured Products</h3>
+        <div class="products">
+            {% for product in products %}
+            <div class="product-card">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                <h4>{{ product.name }}</h4>
+                <p>${{ product.price }}</p>
+                <a href="/product/{{ product.id }}/" class="btn">View Details</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>&copy; 2025 Motoselvic. All Rights Reserved.</p>
+    </div>
+
+    <!-- JavaScript for dynamic behaviors (optional) -->
+    <script src="script.js"></script>
+</body>
+
+</html>

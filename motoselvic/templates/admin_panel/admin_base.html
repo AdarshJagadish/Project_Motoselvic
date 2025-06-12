@@ -1,0 +1,137 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Admin Panel{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <!-- Internal CSS -->
+    <style>
+        body.bg-dark {
+            background-color: #121212 !important;
+        }
+
+        nav.bg-black {
+            background-color: #000 !important;
+        }
+
+        .nav-link.active {
+            background-color: #dc3545 !important;
+            color: white !important;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+
+        .nav-link:hover {
+            background-color: #343a40;
+            color: #00ffcc;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .nav-link {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+    </style>
+</head>
+
+<body class="bg-dark text-white">
+
+    <!-- Mobile Navbar -->
+    <nav class="navbar navbar-dark bg-dark d-md-none">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu"
+                aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <span class="navbar-brand">Motoselvic Admin</span>
+        </div>
+    </nav>
+
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <nav class="collapse d-md-block bg-black p-3" id="sidebarMenu" style="width: 250px; min-height: 100vh;">
+            <h4 class="text-danger mb-4">Motoselvic Admin</h4>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a href="{% url 'admin_dashboard' %}"
+                        class="nav-link text-white {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+                        Dashboard
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{% url 'admin_manage_users' %}"
+                        class="nav-link text-white {% if request.resolver_match.url_name == 'admin_manage_users' %}active{% endif %}">Users</a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{% url 'admin_product_management' %}"
+                        class="nav-link text-white {% if request.resolver_match.url_name == 'admin_product_management' %}active{% endif %}">
+                        Products
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_manage_orders' %}"
+                        class="nav-link text-white {% if request.resolver_match.url_name == 'admin_manage_orders' %}active{% endif %}">
+                        Orders
+                    </a>
+                </li>
+
+                <!-- Corrected Admin Management Links -->
+                <li class="nav-item">
+                    <a href="{% url 'admin_manage_companies' %}"
+                        class="nav-link text-white {% if request.resolver_match.url_name == 'admin_manage_companies' %}active{% endif %}">
+                        Companies
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_manage_bike_models' %}"
+                        class="nav-link text-white {% if request.resolver_match.url_name == 'admin_manage_bike_models' %}active{% endif %}">
+                        Bike Models
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_manage_categories' %}"
+                        class="nav-link text-white {% if request.resolver_match.url_name == 'admin_manage_categories' %}active{% endif %}">
+                        Categories
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'admin_manage_manufacturers' %}"
+                        class="nav-link text-white {% if request.resolver_match.url_name == 'admin_manage_manufacturers' %}active{% endif %}">
+                        Manufacturers
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{% url 'admin_site_settings' %}"
+                        class="nav-link text-white {% if request.resolver_match.url_name == 'admin_site_settings' %}active{% endif %}">Site
+                        Settings</a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{% url 'logout' %}" class="nav-link text-danger">
+                        Logout
+                    </a>
+                </li>
+            </ul>
+
+        </nav>
+
+        <!-- Main Content -->
+        <div class="flex-grow-1 p-4" style="min-height: 100vh;">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+
+    <!-- Bootstrap JS for sidebar toggle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

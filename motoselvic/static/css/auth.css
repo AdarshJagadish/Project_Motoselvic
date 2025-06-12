@@ -1,0 +1,193 @@
+/* General Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: white; /* Kept as per request */
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar */
+.navbar {
+    width: 100%;
+    background-color: rgb(23, 23, 24);
+    padding: 10px 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.navbar-brand {
+    color: white;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: color 0.3s ease-in-out;
+}
+
+.navbar-brand:hover {
+    color: #e50914; /* Red hover effect */
+}
+
+.navbar-brand img {
+    height: 35px;
+    width: auto;
+    margin-right: 10px;
+}
+
+.navbar-nav .nav-link {
+    color: white !important;
+    font-weight: 500;
+    margin-right: 10px;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #e50914 !important;
+}
+
+/* Auth Container */
+.auth-container {
+    perspective: 1000px;
+    margin-top: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 120px);
+}
+
+/* Card Flip Effect */
+.card {
+    width: 400px;
+    height: 450px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s ease-in-out;
+}
+
+.card.flipped {
+    transform: rotateY(180deg);
+}
+
+/* Card Inner */
+.card-inner {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    transform-style: preserve-3d;
+}
+
+/* Card Front and Back */
+.card-front, .card-back {
+    width: 100%;
+    height: 100%;
+    background: white;
+    color: black;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 2rem;
+    position: absolute;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-back {
+    transform: rotateY(180deg);
+}
+
+/* Input Fields */
+.input-group {
+    width: 100%;
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+.input-group label {
+    font-weight: 600;
+    color: black;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Buttons */
+button {
+    padding: 10px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #e50914; /* Red Sign In & Sign Up buttons */
+    color: white;
+    font-weight: bold;
+    transition: background 0.3s;
+    width: 100%;
+}
+
+button:hover {
+    background-color: #b20710; /* Darker red on hover */
+}
+
+/* Remember Me */
+.remember-me {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.remember-me input {
+    margin-right: 8px;
+}
+
+/* Links */
+.toggle-link a {
+    color: #e50914; /* Red for Sign Up & Sign In link */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.toggle-link a:hover {
+    text-decoration: underline;
+}
+
+/* Forgot Password */
+.forgot-password {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.forgot-password a {
+    color: #555;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.forgot-password a:hover {
+    text-decoration: underline;
+}
+@media (max-width: 480px) {
+    .card {
+        width: 90%;
+        height: auto;
+    }
+
+    .card-front, .card-back {
+        padding: 1rem;
+    }
+}
+
+/* Ensure toggle pointer works */
+.toggle-link p {
+    cursor: pointer;
+    margin-top: 1rem;
+    color: #e50914;
+    font-weight: bold;
+}

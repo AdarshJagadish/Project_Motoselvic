@@ -1,0 +1,68 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% load static %}
+{% block title %}Manage SubCategories{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="card bg-dark text-white mx-auto" style="max-width: 1000px;">
+    <div class="card-header bg-danger d-flex justify-content-between align-items-center">
+      <div>
+        <h4 class="mb-0">Subcategories</h4>
+        <small>Category: <strong>{{ category.name }}</strong></small>
+      </div>
+      <div>
+        <a href="{% url 'admin_add_subcategory' category.id %}" class="btn btn-darkred btn-sm fw-semibold me-2">
+          + Add Subcategory
+        </a>
+        <a href="{% url 'admin_manage_categories' %}" class="btn btn-outline-light btn-sm">← Back</a>
+      </div>
+    </div>
+    <div class="card-body">
+      {% if subcategories %}
+      <div class="table-responsive">
+        <table class="table table-dark table-bordered table-hover align-middle mb-0">
+          <thead class="table-danger text-dark">
+            <tr>
+              <th>#</th>
+              <th>Subcategory Name</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for subcategory in subcategories %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ subcategory.sub_category_name }}</td>
+              <td>
+                <a href="{% url 'admin_edit_subcategory' subcategory.id %}" class="btn btn-outline-light btn-sm me-2">Edit</a>
+                <form action="{% url 'admin_delete_subcategory' subcategory.id %}" method="post" class="d-inline"
+                      onsubmit="return confirm('Are you sure to delete this subcategory?')">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <p class="text-muted mb-0">No subcategories found for this category.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .btn-darkred {
+    background-color: #007df1 !important;
+    color: #fff !important;
+    border: none !important;
+  }
+
+  .btn-darkred:hover {
+    background-color: #2e2c2c !important;
+    color: #ffffff !important;
+  }
+</style>
+{% endblock %}

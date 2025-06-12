@@ -1,0 +1,165 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% load static %}
+{% block title %}Manage Products{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="card bg-dark text-white shadow rounded-4 mx-auto" style="max-width: 100%;">
+    <div class="card-header bg-danger d-flex flex-wrap justify-content-between align-items-center">
+      <h4 class="mb-2 mb-md-0">Products</h4>
+      <a href="{% url 'admin_add_product' %}" class="btn btn-darkred btn-sm fw-semibold">+ Add Product</a>
+    </div>
+    <div class="card-body">
+
+      <!-- Filter and Search Form -->
+      <form method="get" class="row g-2 mb-4">
+        <div class="col-md-3">
+          <select name="category" class="form-select">
+            <option value="">All Categories</option>
+            {% for cat in categories %}
+              <option value="{{ cat.id }}" {% if cat.id|stringformat:"s" == selected_category %}selected{% endif %}>{{ cat.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2">
+          <select name="status" class="form-select">
+            <option value="">All Status</option>
+            <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
+            <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>Inactive</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <input
+            type="text"
+            name="search"
+            placeholder="Search name, manufacturer..."
+            value="{{ search_query|default_if_none:'' }}"
+            class="form-control"
+          >
+        </div>
+        <div class="col-md-1">
+          <button type="submit" class="btn btn-darkred w-100">Go</button>
+        </div>
+        <div class="col-md-2">
+          <a href="{% url 'admin_product_management' %}" class="btn btn-secondary w-100">Clear</a>
+        </div>
+      </form>
+
+      {% if products %}
+      <div class="table-responsive">
+        <table class="table table-dark table-bordered table-hover align-middle text-center">
+          <thead class="table-danger text-dark">
+            <tr>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>Manufacturer</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in products %}
+            <tr>
+              <td>
+                {% if product.get_main_image %}
+                  <img src="{{ product.get_main_image.image.url }}" alt="{{ product.name }}" class="img-thumbnail" style="width: 70px; height: 70px; object-fit: cover;">
+                {% else %}
+                  <span class="text-muted">No Image</span>
+                {% endif %}
+              </td>
+              <td class="text-truncate" style="max-width: 150px;">
+                <a href="{% url 'admin_edit_product' product.id %}" class="text-white text-decoration-none">{{ product.name }}</a>
+              </td>
+              <td>{{ product.subcategory.category.name }}</td>
+              <td>₹{{ product.price|floatformat:2 }}</td>
+              <td>{{ product.stock }}</td>
+              <td class="text-truncate" style="max-width: 120px;">{{ product.manufacturer.manufacturer_name }}</td>
+              <td>
+                {% if product.is_active %}
+                  <span class="badge bg-success">Active</span>
+                {% else %}
+                  <span class="badge bg-danger">Inactive</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="d-flex flex-column flex-md-row justify-content-center">
+                  <a href="{% url 'admin_edit_product' product.id %}" class="btn btn-outline-light btn-sm m-1">Edit</a>
+                  <a href="{% url 'admin_delete_product' product.id %}" class="btn btn-outline-danger btn-sm m-1" onclick="return confirm('Are you sure?')">Delete</a>
+                  <a href="{% url 'admin_manage_product_images' product.id %}" class="btn btn-outline-info btn-sm m-1">Images</a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <nav aria-label="Page navigation" class="mt-3">
+        <ul class="pagination justify-content-center">
+          {% if products.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if status %}status={{ status }}&{% endif %}{% if search_query %}search={{ search_query }}&{% endif %}page={{ products.previous_page_number }}" aria-label="Previous">&laquo;</a>
+            </li>
+          {% endif %}
+
+          {% for num in products.paginator.page_range %}
+            {% if num >= products.number|add:'-2' and num <= products.number|add:'2' %}
+              <li class="page-item {% if products.number == num %}active{% endif %}">
+                <a class="page-link" href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if status %}status={{ status }}&{% endif %}{% if search_query %}search={{ search_query }}&{% endif %}page={{ num }}">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+
+          {% if products.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if status %}status={{ status }}&{% endif %}{% if search_query %}search={{ search_query }}&{% endif %}page={{ products.next_page_number }}" aria-label="Next">&raquo;</a>
+            </li>
+          {% endif %}
+        </ul>
+        <p class="text-center text-muted">Page {{ products.number }} of {{ products.paginator.num_pages }}</p>
+      </nav>
+      {% else %}
+        <p class="text-center text-muted py-3">No products found. Click “+ Add Product” to create your first one.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .btn-darkred {
+    background-color: #007df1 !important;
+    color: #fff !important;
+    border: none !important;
+  }
+  .btn-darkred:hover {
+    background-color: #2e2c2c !important;
+    color: #ffffff !important;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .table-responsive table {
+    min-width: 700px;
+  }
+
+  @media (max-width: 768px) {
+    .card-header h4 {
+      font-size: 1.25rem;
+    }
+    .table thead {
+      font-size: 0.9rem;
+    }
+    .table td,
+    .table th {
+      font-size: 0.875rem;
+      vertical-align: middle;
+    }
+  }
+</style>
+{% endblock %}

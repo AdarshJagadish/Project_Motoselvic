@@ -1,0 +1,323 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ product.name }} - Motoselvic{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+  <div class="row g-4">
+    <!-- Product Images -->
+    <div class="col-md-6">
+      {% if main_image %}
+      <img id="mainImage" src="{{ main_image.image.url }}" alt="{{ product.name }}" class="img-fluid rounded w-100"
+        style="max-height: 400px; object-fit: contain;">
+      {% else %}
+      <img id="mainImage" src="{% static 'images/default-product.png' %}" alt="Default Image"
+        class="img-fluid rounded w-100" style="max-height: 400px; object-fit: contain;">
+      {% endif %}
+
+      <div class="d-flex flex-wrap gap-2 mt-3">
+        {% for img in product.images.all %}
+        <img src="{{ img.image.url }}" alt="{{ product.name }} thumbnail" class="img-thumbnail thumb-image"
+          style="width: 80px; height: 80px; cursor: pointer; object-fit: cover;" role="button" tabindex="0" onclick="document.getElementById('mainImage').src='{{ img.image.url }}'" onkeydown="if(event.key==='Enter' || event.key===' ') { document.getElementById('mainImage').src='{{ img.image.url }}'; event.preventDefault(); }">
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Product Details -->
+    <div class="col-md-6 text-light">
+      <h2 class="text-danger fw-bold">{{ product.name }}</h2>
+      <p class="lead">{{ product.description }}</p>
+      <div class="mb-3">
+        <span class="fs-4 fw-bold text-danger">₹{{ product.price }}</span>
+        <span class="text-light text-decoration-line-through ms-2">₹{{ product.mrp }}</span>
+      </div>
+      <p><strong>Manufacturer:</strong> {{ product.manufacturer }}</p>
+
+      <!-- Average Rating -->
+      <p><strong>Average Rating:</strong>
+        {% for i in "12345" %}
+          {% if forloop.counter <= avg_rating %}
+            <i class="fas fa-star text-warning"></i>
+          {% elif avg_rating|floatformat:1 == forloop.counter0|stringformat:"d.5" %}
+            <i class="fas fa-star-half-alt text-warning"></i>
+          {% else %}
+            <i class="far fa-star text-warning"></i>
+          {% endif %}
+        {% endfor %}
+        <span>({{ product.reviews.count }} review{{ product.reviews.count|pluralize }})</span>
+      </p>
+
+
+      <!-- Sizes -->
+      {% if product.sizes.exists %}
+      <div class="mb-4">
+        <label class="form-label fw-semibold">Choose Size:</label>
+        <div id="sizeOptions" class="d-flex flex-wrap gap-2" role="list" aria-label="Size options">
+          {% for size in product.sizes.all %}
+          <div class="btn btn-outline-danger size-option" data-size="{{ size.size }}" role="button" tabindex="0"
+            aria-pressed="false">
+            {{ size.size }}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Colors -->
+      {% if product.colors.exists %}
+      <div class="mb-5">
+        <label class="form-label fw-semibold">Choose Color:</label>
+        <div id="colorOptions" class="d-flex flex-wrap gap-3 align-items-center" role="list" aria-label="Color options">
+          {% for color in product.colors.all %}
+          <div class="color-circle rounded-circle border border-danger"
+            style="background-color: {{ color.hex_code|default:'#ccc' }};" data-color="{{ color.hex_code }}" role="button" tabindex="0" aria-pressed="false" title="{{ color.name }}">
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Add to Cart -->
+      <form method="POST" action="{% url 'add_to_cart' product.id %}" id="addToCartForm">
+        {% csrf_token %}
+        <input type="hidden" name="selected_size" id="selectedSizeInput" />
+        <input type="hidden" name="selected_color" id="selectedColorInput" />
+        <div class="d-flex gap-3">
+          <button type="submit" name="add_to_cart" class="btn btn-danger flex-grow-1">Add to Cart</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Reviews -->
+  <section class="mt-5 text-light">
+    <h3>Customer Reviews</h3>
+    {% if product.reviews.exists %}
+      {% for review in product.reviews.all %}
+      <div class="review">
+        <strong>{{ review.user.username }}</strong><br>
+        <span>
+          {% for i in "12345" %}
+            {% if forloop.counter <= review.rating %}
+              <i class="fas fa-star text-warning"></i>
+            {% else %}
+              <i class="far fa-star text-warning"></i>
+            {% endif %}
+          {% endfor %}
+        </span>
+        <p>{{ review.description }}</p>
+        <small>Reviewed on {{ review.created_at|date:"M d, Y" }}</small>
+      </div>
+      <hr>
+      {% endfor %}
+    {% else %}
+    <p>No reviews yet. Be the first to review this product!</p>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+    <div class="card bg-dark mt-5">
+      <div class="card-body">
+        <h5 class="card-title text-danger">Add a Review</h5>
+        <form method="POST" action="{% url 'add_review' product.id %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Rating:</label>
+            <div id="rating-stars" class="d-flex gap-1 fs-4">
+              {% for i in "12345" %}
+              <i class="far fa-star text-warning star-input" data-value="{{ forloop.counter }}"></i>
+              {% endfor %}
+            </div>
+            <input type="hidden" name="rating" id="ratingInput" required>
+          </div>
+          <div class="mb-3">
+            <label for="comment" class="form-label">Comment:</label>
+            <textarea name="description" id="comment" class="form-control" rows="3" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-danger">Submit Review</button>
+        </form>
+      </div>
+    </div>
+    {% else %}
+    <p class="text mt-3">Please <a href="{% url 'signin' %}" class="text-danger">sign in</a> to leave a review.</p>
+    {% endif %}
+  </section>
+
+  <!-- Related Products -->
+  {% if similar_products %}
+  <div class="mt-5">
+    <h3 class="text-danger fw-bold mb-4">You may also like</h3>
+    <div class="related-products-wrapper position-relative">
+      <button class="scroll-btn scroll-left" aria-label="Scroll left">&lsaquo;</button>
+      <div class="related-products-container d-flex gap-3" tabindex="0" role="list">
+        {% for p in similar_products %}
+        <div class="card related-product-card bg-white text-dark" style="width: 220px;">
+          <a href="{% url 'product_detail' p.id %}" class="stretched-link" aria-label="View {{ p.name }}"></a>
+          {% with main_img=p.get_main_image %}
+          <img src="{{ main_img.image.url }}" alt="{{ p.name }}" class="card-img-top" style="height: 180px; object-fit: contain;">
+          {% endwith %}
+          <div class="card-body">
+            <h6 class="card-title text-truncate" title="{{ p.name }}">{{ p.name }}</h6>
+            <p class="card-text fw-bold text-danger fs-5">₹{{ p.price }}</p>
+            <form method="POST" action="{% url 'add_to_cart' p.id %}" onsubmit="event.stopPropagation();">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-danger w-100">Add to Cart</button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <button class="scroll-btn scroll-right" aria-label="Scroll right">&rsaquo;</button>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock content %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const sizeOptions = document.querySelectorAll('.size-option');
+    const selectedSizeInput = document.getElementById('selectedSizeInput');
+    if (sizeOptions.length && !selectedSizeInput.value) {
+      sizeOptions[0].classList.add('active');
+      selectedSizeInput.value = sizeOptions[0].dataset.size;
+    }
+    sizeOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        sizeOptions.forEach(o => o.classList.remove('active'));
+        option.classList.add('active');
+        selectedSizeInput.value = option.dataset.size;
+      });
+    });
+
+    const colorOptions = document.querySelectorAll('.color-circle');
+    const selectedColorInput = document.getElementById('selectedColorInput');
+    if (colorOptions.length && !selectedColorInput.value) {
+      colorOptions[0].classList.add('active');
+      selectedColorInput.value = colorOptions[0].dataset.color;
+    }
+    colorOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        colorOptions.forEach(o => o.classList.remove('active'));
+        option.classList.add('active');
+        selectedColorInput.value = option.dataset.color;
+      });
+    });
+
+    const form = document.getElementById('addToCartForm');
+    form.addEventListener('submit', (e) => {
+      if ((sizeOptions.length && !selectedSizeInput.value) || (colorOptions.length && !selectedColorInput.value)) {
+        e.preventDefault();
+        alert('Please select all required options.');
+      }
+    });
+
+    const stars = document.querySelectorAll('.star-input');
+    const ratingInput = document.getElementById('ratingInput');
+    stars.forEach(star => {
+      star.addEventListener('click', () => {
+        const val = parseInt(star.dataset.value);
+        ratingInput.value = val;
+        stars.forEach((s, i) => {
+          s.classList.toggle('fas', i < val);
+          s.classList.toggle('far', i >= val);
+        });
+      });
+    });
+
+    // Scroll
+    const scrollContainer = document.querySelector('.related-products-container');
+    document.querySelector('.scroll-left').addEventListener('click', () => {
+      scrollContainer.scrollBy({ left: -240, behavior: 'smooth' });
+    });
+    document.querySelector('.scroll-right').addEventListener('click', () => {
+      scrollContainer.scrollBy({ left: 240, behavior: 'smooth' });
+    });
+  });
+</script>
+
+<style>
+  .size-option {
+    border: 2px solid #dc3545;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .size-option.active {
+    background-color: #760a14;
+    color: white;
+  }
+  .color-circle {
+  border-color: #ffffff !important;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border-width 0.2s ease;
+  }
+  .color-circle.active {
+    padding: 20px;
+    border-width: 20px;
+    border-color: #ff2f00 !important;
+  }
+  .thumb-image:hover {
+    transform: scale(1.1);
+    transition: transform 0.3s ease;
+  }
+  .star-input {
+    cursor: pointer;
+  }
+
+  .related-products-container {
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .related-products-container::-webkit-scrollbar {
+    display: none;
+  }
+  .related-product-card {
+    border-radius: 8px;
+    overflow: hidden;
+    transition: 0.3s;
+    flex-shrink: 0;
+  }
+  .related-product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(220, 53, 69, 0.3);
+  }
+
+  .scroll-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background-color: rgba(220, 53, 69, 0.9);
+    color: white;
+    border: none;
+    font-size: 24px;
+    line-height: 1;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .scroll-btn:hover {
+    background-color: #c82333;
+    transform: translateY(-50%) scale(1.1);
+  }
+  .scroll-left {
+    left: -15px;
+  }
+  .scroll-right {
+    right: -15px;
+  }
+</style>
+{% endblock extra_scripts %}

@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment for Order #{{ order.id }}{% endblock %}
+
+{% block head_extra %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<style>
+  .payment-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+  }
+  .payment-info {
+    margin-bottom: 20px;
+  }
+  .btn-pay {
+    background-color: #198754;
+    border: none;
+    color: white;
+    padding: 12px 24px;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .btn-pay:hover {
+    background-color: #146c43;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="payment-container">
+  <h2>Pay for Order #{{ order.id }}</h2>
+  <div class="payment-info">
+    <p><strong>Amount to Pay:</strong> ₹{{ order.total_amount }}</p>
+    <p><strong>Payment Method:</strong> Razorpay</p>
+  </div>
+
+  <button id="rzp-button" class="btn-pay">Pay Now</button>
+</div>
+
+<script>
+  // Razorpay options
+  var options = {
+    "key": "{{ razorpay_key }}", // Razorpay API key passed from view
+    "amount": "{{ order.total_amount|floatformat:2|floatformat:"0"|add:'0' }}00", // Amount in paise (₹ * 100)
+    "currency": "INR",
+    "name": "Motoselvic",
+    "description": "Payment for Order #{{ order.id }}",
+    "order_id": "{{ razorpay_order_id }}", // Razorpay order ID from backend
+    "handler": function (response){
+        // On successful payment, send response to backend to verify and complete
+        fetch("{% url 'payment_success' order.id %}", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}",
+          },
+          body: JSON.stringify({
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+          })
+        }).then(res => res.json())
+          .then(data => {
+            if(data.status === 'success'){
+              alert("Payment successful!");
+              window.location.href = "{% url 'order_detail' order.id %}";
+            } else {
+              alert("Payment verification failed. Please contact support.");
+            }
+          })
+          .catch(() => {
+            alert("Error verifying payment. Please try again.");
+          });
+    },
+    "prefill": {
+      "name": "{{ order.user.get_full_name|default:order.user.username }}",
+      "email": "{{ order.shipping_email }}",
+      "contact": "{{ order.shipping_phone }}"
+    },
+    "theme": {
+      "color": "#198754"
+    }
+  };
+
+  var rzp1 = new Razorpay(options);
+
+  document.getElementById('rzp-button').onclick = function(e){
+    rzp1.open();
+    e.preventDefault();
+  }
+</script>
+{% endblock %}

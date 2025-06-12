@@ -1,0 +1,42 @@
+{% extends 'admin_panel/admin_base.html' %}
+
+{% block title %}Manage Product Colors{% endblock %}
+
+{% block content %}
+<div class="container mt-5 text-white">
+    <h2 class="mb-4 text-danger">Manage Product Colors</h2>
+    <a href="{% url 'admin_add_color' %}" class="btn btn-danger mb-3">Add New Color</a>
+
+    {% if colors %}
+    <table class="table table-dark table-bordered table-hover">
+        <thead class="bg-danger text-white">
+            <tr>
+                <th>#</th>
+                <th>Color Name</th>
+                <th>Color Code</th>
+                <th>Preview</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for color in colors %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ color.name }}</td>
+                <td>{{ color.hex_code }}</td>
+                <td>
+                    <div style="width: 30px; height: 30px; background-color: {{ color.hex_code }}; border-radius: 4px;"></div>
+                </td>
+                <td>
+                    <a href="{% url 'admin_edit_color' color.id %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'admin_delete_color' color.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this color?');">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-info">No colors added yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

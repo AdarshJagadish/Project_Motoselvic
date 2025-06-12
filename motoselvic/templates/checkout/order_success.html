@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="container py-5 text-white">
+    <h2>🎉 Order Placed!</h2>
+    <p>Thank you for your purchase, {{ request.user.username }}.</p>
+    <p>Your order ID is <strong>#{{ order.id }}</strong>.</p>
+
+    <h4 class="mt-4">Order Summary:</h4>
+    <ul class="list-group text-dark">
+    {% for item in order_items %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <strong>{{ item.product.name }}</strong> (x{{ item.quantity }})
+            </div>
+            <div>
+                ₹{{ item.product.price|floatformat:"0" }} × {{ item.quantity }} = ₹{{ item.product.price|multiply:item.quantity|floatformat:"0" }}
+            </div>
+        </li>
+    {% endfor %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <div>Delivery Charge</div>
+        <div>₹40</div>
+    </li>
+</ul>
+
+<div class="mt-4">
+    <h5>Total Amount: ₹{{ order.total_amount }}</h5>
+</div>
+
+
+    <a href="{% url 'home' %}" class="btn btn-outline-light mt-4">Continue Shopping</a>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% load custom_filters %}
+{% block content %}
+
+<div class="container py-4">
+    <h2 class="mb-4 fw-bold text-white">Order #{{ order.id }} Details</h2>
+
+    <div class="card mb-4 bg-dark text-white border border-secondary">
+        <div class="card-body">
+            <p><strong>User:</strong> {{ order.user.username }}</p>
+            <p><strong>Order Date:</strong> {{ order.order_date|date:"Y-m-d H:i" }}</p>
+            <p><strong>Total Amount:</strong> ₹{{ order.total_amount|floatformat:2 }}</p>
+        </div>
+    </div>
+
+    <h4 class="text-white">Order Items</h4>
+    <div class="table-responsive mb-4">
+        <table class="table table-dark table-hover align-middle">
+            <thead class="table-danger">
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price/Unit</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>₹{{ item.price|floatformat:2 }}</td>
+                {% endfor %}
+                    <td>₹{{ order.total_amount }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h4 class="text-white mb-3">Update Status</h4>
+    <form method="POST" class="bg-dark border border-secondary p-3 rounded" action="">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="status" class="form-label text-white">Order Status</label>
+            <select name="status" id="status" class="form-select" required>
+                {% for key, label in status_choices %}
+                    <option value="{{ key }}" {% if order.status == key %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-danger">Update Status</button>
+        <a href="{% url 'admin_manage_orders' %}" class="btn btn-outline-light ms-2">Back to Orders List</a>
+    </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% block title %}{% if bike %}Edit{% else %}Add{% endif %} Bike Model{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="card bg-dark text-white mx-auto" style="max-width: 700px;">
+    <div class="card-header bg-danger d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">{% if bike %}Edit{% else %}Add{% endif %} Bike Model</h4>
+      <a href="{% url 'admin_manage_bike_models' %}" class="btn btn-darkred btn-sm fw-semibold">
+        ← Back to List
+      </a>
+    </div>
+    <div class="card-body">
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="mb-3">
+          <label for="company_name" class="form-label">Company</label>
+          <select id="company_name" name="company_name" class="form-control custom-input" required>
+            <option value="">Select Company</option>
+            {% for company in companies %}
+              <option value="{{ company.id }}" {% if bike and bike.company_name.id == company.id %}selected{% endif %}>
+                {{ company.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="series_name" class="form-label">Series Name (optional)</label>
+          <input type="text" id="series_name" name="series_name"
+                 class="form-control custom-input"
+                 value="{{ bike.series_name|default_if_none:'' }}">
+        </div>
+
+        <div class="mb-3">
+          <label for="model_name" class="form-label">Model Name</label>
+          <input type="text" id="model_name" name="model_name"
+                 class="form-control custom-input"
+                 value="{{ bike.model_name|default_if_none:'' }}" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="cc" class="form-label">CC</label>
+          <input type="number" id="cc" name="cc"
+                 class="form-control custom-input"
+                 value="{{ bike.cc|default_if_none:'' }}" required min="0">
+        </div>
+
+        <div class="mb-3">
+          <label for="image" class="form-label">Image (optional)</label>
+          {% if bike and bike.image %}
+            <div class="mb-2">
+              <img src="{{ bike.image.url }}" alt="Current Image" style="max-height: 150px;" class="img-thumbnail">
+            </div>
+          {% endif %}
+          <input type="file" id="image" name="image" class="form-control custom-input">
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <button type="submit" class="btn btn-success">
+            {% if bike %}Update{% else %}Add{% endif %}
+          </button>
+          <a href="{% url 'admin_manage_bike_models' %}" class="btn btn-outline-light">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+  .custom-input {
+    background-color: #dee2e6 !important;
+    color: #000 !important;
+  }
+
+  .btn-darkred {
+    background-color: #8B0000 !important;
+    color: #fff;
+    border: none;
+  }
+
+  .btn-darkred:hover {
+    background-color: #a80000 !important;
+  }
+</style>
+{% endblock %}

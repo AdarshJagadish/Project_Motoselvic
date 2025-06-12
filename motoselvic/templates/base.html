@@ -1,0 +1,271 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Motoselvic{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'css/home.css' %}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <style>
+        /* CSS Variables */
+        :root {
+            --primary-color: #e53935;
+            --dark-bg: #111;
+            --light-bg: #f9f9f9;
+            --text-dark: #333;
+            --text-light: #ccc;
+            --red: #cc0000;
+            --bg-dark: #0d0d0d;
+        }
+
+        /* General reset and typography */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background-color: rgb(16, 16, 16);
+            color: var(--light-bg);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .profile-img{
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: solid red 2px;
+        }
+
+        /* Navbar styles */
+        .navbar {
+            background-color: var(--bg-dark);
+            padding: 0.75rem 2rem;
+            border-bottom: 1px solid #222;
+        }
+
+        .navbar .nav-link {
+            color: var(--text-light) !important;
+            font-weight: 500;
+        }
+
+        .navbar .nav-link:hover,
+        .navbar .nav-link.active {
+            color: var(--red) !important;
+        }
+
+        .navbar-brand img {
+            height: 40px;
+        }
+
+        /* Button */
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #c62828;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #111;
+            padding: 3rem 1rem 2rem;
+            color: var(--text-light);
+        }
+
+        .footer-heading {
+            color: var(--red);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        footer a {
+            color: #ccc;
+            display: block;
+            margin-bottom: 0.4rem;
+        }
+
+        footer a:hover {
+            color: var(--red);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #222;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand me-5" href="/">
+                <img src="{{ logo.logo.url }}" alt="Motoselvic Logo" />
+            </a>
+            <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-between" id="navMenu">
+                <!-- Links -->
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-3">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/products/">Shop</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Brands</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
+                </ul>
+
+                <!-- Search -->
+                <form method="get" action="/products/" class="d-flex align-items-center">
+                    <input type="hidden" name="category" id="selectedCategoryId" value="">
+
+                    <!-- <div class="dropdown me-2">
+                        <button class="btn btn-dark dropdown-toggle" type="button" id="categoryDropdown"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <span id="categoryName">All</span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="categoryDropdown">
+                            {% for cat in categories %}
+                            <li><a class="dropdown-item" href="#"
+                                    onclick="selectCategory('{{ cat.id }}', '{{ cat.name }}'); return false;">{{
+                                    cat.name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div> -->
+
+                    <input type="text" class="form-control me-2" name="query" value="{{ query }}"
+                        placeholder="Search products..." />
+                    <button class="btn btn-outline-light" type="submit"><i class="fas fa-search"></i></button>
+                </form>
+
+                <!-- Profile / Cart -->
+                <ul class="navbar-nav d-flex align-items-center gap-3">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/cart/">
+                            <i class="fas fa-shopping-cart fa-lg"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item d-flex align-items-center">
+                        {% if user.is_authenticated %}
+                        <a class="nav-link d-flex align-items-center" href="/dashboard/">
+                            {% if user.userprofile.profile_picture %}
+                            <img src="{{ user.userprofile.profile_picture.url }}" class="profile-img me-2"
+                                alt="Profile" />
+                            {% else %}
+                            <img src="{% static 'images/icons/profile-user.png' %}" class="profile-img me-2"
+                                alt="Default Profile" width="30px" height="30px" />
+                            {% endif %}
+                            {{ user.username }}
+                        </a>
+                        <form method="post" action="{% url 'logout' %}" class="ms-2">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-light">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                            </button>
+                        </form>
+                        {% else %}
+                        <a class="nav-link" href="/signin/"><i class="fas fa-user-circle fa-lg"></i></a>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main -->
+    <main class="flex-grow-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto">
+        <div class="container">
+            <div class="row row-cols-1 row-cols-md-4 g-4">
+                <div class="col">
+                    <h5 class="footer-heading">About</h5>
+                    <p>Motoselvic is your one-stop-shop for premium bike accessories, parts, and apparel in India.</p>
+                </div>
+                <div class="col">
+                    <h5 class="footer-heading">Quick Links</h5>
+                    <a href="/contact">Contact</a>
+                    <a href="#">Terms & Conditions</a>
+                    <a href="#">Return Policy</a>
+                    <a href="#">Privacy Policy</a>
+                </div>
+                <div class="col">
+                    <h5 class="footer-heading">Explore</h5>
+                    <a href="#">Brands</a>
+                    <a href="#">Categories</a>
+                    <a href="/products/">Shop Now</a>
+                </div>
+                <div class="col">
+                    <h5 class="footer-heading">Get in Touch</h5>
+                    <p>Email: info@motoselvic.com</p>
+                    <p>Phone: +91 9876543210</p>
+                    <p>Address: Motoselvic Pvt Ltd, Thrissur, Kerala</p>
+                </div>
+            </div>
+            <div class="footer-bottom mt-4">
+                &copy; 2025 Motoselvic. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/home.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_scripts %}{% endblock %}
+    <script>
+        function selectCategory(id, name) {
+            document.getElementById("selectedCategoryId").value = id;
+            document.getElementById("categoryName").innerText = name;
+        }
+
+        // Show Bootstrap dropdown on hover
+        document.addEventListener("DOMContentLoaded", function () {
+            const dropdown = document.querySelector(".dropdown");
+            if (window.innerWidth > 768) {
+                dropdown.addEventListener("mouseenter", function () {
+                    const menu = this.querySelector(".dropdown-menu");
+                    menu.classList.add("show");
+                    this.classList.add("show");
+                });
+                dropdown.addEventListener("mouseleave", function () {
+                    const menu = this.querySelector(".dropdown-menu");
+                    menu.classList.remove("show");
+                    this.classList.remove("show");
+                });
+            }
+        });
+    </script>
+
+</body>
+
+</html>

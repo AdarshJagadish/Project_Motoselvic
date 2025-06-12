@@ -1,0 +1,59 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% block title %}Site Settings{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="card bg-dark text-white mx-auto" style="max-width: 600px;">
+    <div class="card-header bg-danger">
+      <h4 class="mb-0">Site Settings</h4>
+    </div>
+    <div class="card-body">
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Site Name -->
+        <div class="mb-3">
+          <label for="name" class="form-label">Site Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            class="form-control bg-secondary text-white"
+            value="{{ site.name|default:'' }}"
+            required
+          >
+        </div>
+        
+        <!-- Site Logo -->
+        <div class="mb-4">
+          <label for="logo" class="form-label">Site Logo</label><br>
+          {% if site.logo %}
+            <img
+              src="{{ site.logo.url }}"
+              alt="Site Logo"
+              class="img-thumbnail mb-2"
+              style="max-height: 100px;"
+            ><br>
+          {% endif %}
+          <input
+            type="file"
+            id="logo"
+            name="logo"
+            class="form-control form-control-sm"
+          >
+        </div>
+        
+        <!-- Save Button -->
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
+            ← Cancel
+          </a>
+          <button type="submit" class="btn btn-danger">
+            Save Settings
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

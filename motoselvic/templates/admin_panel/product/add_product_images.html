@@ -1,0 +1,24 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% block title %}Add Product Image{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-white">Add Image for: <strong>{{ product.name }}</strong></h2>
+
+    <form method="POST" enctype="multipart/form-data" class="bg-dark p-4 rounded shadow-sm">
+        {% csrf_token %}
+        <div class="form-group mb-3">
+            <label for="image" class="form-label text-white">Select Image</label>
+            <input type="file" name="images" id="images" class="form-control" multiple required>
+        </div>
+
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" name="is_main" id="is_main">
+            <label class="form-check-label text-white" for="is_main">Set as Main Image</label>
+        </div>
+
+        <button type="submit" class="btn btn-danger">Upload Image</button>
+        <a href="{% url 'admin_manage_product_images' product.id %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

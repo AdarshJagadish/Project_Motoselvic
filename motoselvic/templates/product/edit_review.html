@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Review - {{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <h2 class="text-danger">Edit Your Review for "{{ product.name }}"</h2>
+  <form method="POST" action="{% url 'edit_review' product.id review.id %}">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label class="form-label">Rating:</label>
+      <div id="starRating" class="d-flex gap-1 fs-4 text-warning" style="cursor: pointer;">
+        {% for i in "12345" %}
+          <i class="{% if review.rating >= i|add:'0' %}fas{% else %}far{% endif %} fa-star" data-value="{{ i }}"></i>
+        {% endfor %}
+      </div>
+      <input type="hidden" name="rating" id="selectedRating" value="{{ review.rating }}" required>
+    </div>
+    <div class="mb-3">
+      <label for="description" class="form-label">Comment:</label>
+      <textarea id="description" name="description" class="form-control" rows="4" required>{{ review.description }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-danger">Save Changes</button>
+    <a href="{% url 'product_detail' product.id %}" class="btn btn-secondary ms-2">Cancel</a>
+  </form>
+</div>
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const stars = document.querySelectorAll('#starRating i');
+    const selectedRating = document.getElementById('selectedRating');
+
+    stars.forEach(star => {
+      star.addEventListener('click', () => {
+        const value = star.dataset.value;
+        selectedRating.value = value;
+        stars.forEach(s => {
+          if (parseInt(s.dataset.value) <= value) {
+            s.classList.add('fas');
+            s.classList.remove('far');
+          } else {
+            s.classList.add('far');
+            s.classList.remove('fas');
+          }
+        });
+      });
+    });
+  });
+</script>
+{% endblock %}

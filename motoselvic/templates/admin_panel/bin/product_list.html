@@ -1,0 +1,48 @@
+{% extends 'admin_panel/admin_base.html' %}
+
+{% block title %}Manage Products{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Manage Products</h2>
+
+<div class="mb-3">
+    <a href="{% url 'admin:admin_add_product' %}" class="btn btn-primary">Add New Product</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>#</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ product.name }}</td>
+                <td>{{ product.category.name }}</td>
+                <td>${{ product.price }}</td>
+                <td>
+                    {% if product.status == 'Active' %}
+                        <span class="badge bg-success">{{ product.status }}</span>
+                    {% else %}
+                        <span class="badge bg-danger">{{ product.status }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'admin:admin_edit_product' product.id %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'admin:admin_delete_product' product.id %}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

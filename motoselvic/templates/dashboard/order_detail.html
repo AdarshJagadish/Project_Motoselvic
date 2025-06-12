@@ -1,0 +1,362 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+{% block content %}
+
+<style>
+  /* Container */
+  .order-container {
+    max-width: 850px;
+    margin: 50px auto;
+    padding: 40px 35px;
+    background: linear-gradient(145deg, #121212, #1c1c1c);
+    border-radius: 16px;
+    box-shadow:
+      0 4px 15px rgba(0,0,0,0.6),
+      inset 0 0 10px rgba(255,255,255,0.05);
+    color: #e0e0e0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  /* Header */
+  .order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #2a2a2a;
+    padding-bottom: 18px;
+    margin-bottom: 40px;
+  }
+
+  .order-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: #f1f1f1;
+  }
+
+  .order-header span {
+    font-size: 14px;
+    color: #bbb;
+    font-weight: 500;
+    font-style: italic;
+  }
+
+  /* Order Tracker */
+  .order-tracker {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 45px 0 65px;
+  }
+
+  .order-tracker::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 6%;
+    right: 6%;
+    height: 3px;
+    background: linear-gradient(to right, #444, #666, #444);
+    border-radius: 2px;
+    transform: translateY(-50%);
+    z-index: 1;
+  }
+
+  /* Steps */
+  .step {
+    position: relative;
+    z-index: 2;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #292929;
+    border: 3.5px solid #3d3d3d;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #999;
+    font-weight: 700;
+    font-size: 16px;
+    user-select: none;
+    cursor: default;
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.6);
+    transition: background 0.35s, border-color 0.35s, color 0.35s, box-shadow 0.35s;
+  }
+
+  /* Labels under steps */
+  .step span.label {
+    position: absolute;
+    top: 115%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    font-size: 13px;
+    color: #bbb;
+    font-weight: 600;
+    white-space: nowrap;
+    user-select: none;
+    text-align: center;
+    letter-spacing: 0.02em;
+  }
+
+  /* Completed step */
+  .step.completed {
+    background: #28c76f;
+    border-color: #28c76f;
+    color: #fff;
+    box-shadow: 0 0 12px #28c76f;
+  }
+
+  /* Current step */
+  .step.current {
+    background: #339af0;
+    border-color: #339af0;
+    color: #fff;
+    box-shadow: 0 0 15px #339af0;
+  }
+
+  /* Cancelled step */
+  .step.cancelled {
+    background: #ff6b6b;
+    border-color: #ff6b6b;
+    color: #fff;
+    box-shadow: 0 0 12px #ff6b6b;
+  }
+
+  /* Cancel button */
+  .cancel-btn {
+    display: inline-block;
+    margin: 20px 0 50px;
+    padding: 12px 28px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    background: #ff4c4c;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(255, 76, 76, 0.7);
+    transition: background 0.3s ease;
+    user-select: none;
+  }
+  .cancel-btn:hover,
+  .cancel-btn:focus {
+    background: #e84343;
+    outline: none;
+  }
+
+  /* Shipping info */
+  .order-info h3 {
+    font-weight: 700;
+    font-size: 22px;
+    margin-bottom: 15px;
+    color: #f5f5f5;
+  }
+
+  .order-info p {
+    font-size: 15px;
+    margin: 7px 0;
+    line-height: 1.4;
+    color: #ccc;
+  }
+
+  /* Order items */
+  .order-items h4 {
+    font-weight: 700;
+    font-size: 20px;
+    margin-bottom: 18px;
+    color: #f5f5f5;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+    font-size: 15px;
+  }
+
+  thead th {
+    text-align: left;
+    color: #bbb;
+    font-weight: 600;
+    padding: 10px 12px;
+    border-bottom: 2px solid #2c2c2c;
+  }
+
+  tbody tr {
+    background: #222;
+    border-radius: 12px;
+    box-shadow: inset 0 0 10px #111;
+  }
+
+  tbody tr:hover {
+    background: #2a2a2a;
+  }
+
+  tbody td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    color: #ddd;
+  }
+
+  tbody td img {
+    height: 64px; /* increased size */
+    width: 64px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.8);
+  }
+
+  /* Right align quantity, price, subtotal */
+  tbody td:nth-child(3),
+  tbody td:nth-child(4),
+  tbody td:nth-child(5) {
+    text-align: right;
+  }
+
+  /* Total amount */
+  .order-items p {
+    text-align: right;
+    font-weight: 700;
+    font-size: 18px;
+    color: #eee;
+    margin-top: 14px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .order-container {
+      padding: 25px 20px;
+      margin: 30px auto;
+    }
+
+    .order-header h2 {
+      font-size: 22px;
+    }
+
+    .order-header span {
+      font-size: 13px;
+    }
+
+    .order-tracker {
+      margin: 30px 0 55px;
+    }
+
+    .step {
+      width: 44px;
+      height: 44px;
+      font-size: 14px;
+      border-width: 3px;
+    }
+
+    .step span.label {
+      width: 90px;
+      font-size: 11px;
+      top: 110%;
+    }
+
+    tbody td img {
+      height: 48px;
+      width: 48px;
+    }
+
+    table {
+      font-size: 13px;
+    }
+  }
+</style>
+
+<div class="order-container" role="main" aria-label="Order Details">
+  <div class="order-header">
+    <h2>Order #{{ order.id }}</h2>
+    <span>Placed on {{ order.order_date|date:"F j, Y" }}</span>
+  </div>
+
+  <div class="order-tracker" role="list" aria-label="Order Status Tracker">
+    {% for status in statuses %}
+      {% if order.status == 'Cancelled' %}
+        <div class="step cancelled" title="{{ status }}" role="listitem" aria-current="false">
+          <span>{{ forloop.counter }}</span>
+          <span class="label">{{ status }}</span>
+        </div>
+      {% elif forloop.counter0 < current_index %}
+        <div class="step completed" title="{{ status }}" role="listitem" aria-current="false">
+          <span>{{ forloop.counter }}</span>
+          <span class="label">{{ status }}</span>
+        </div>
+      {% elif forloop.counter0 == current_index %}
+        <div class="step current" title="{{ status }}" role="listitem" aria-current="step">
+          <span>{{ forloop.counter }}</span>
+          <span class="label">{{ status }}</span>
+        </div>
+      {% else %}
+        <div class="step" title="{{ status }}" role="listitem" aria-current="false">
+          <span>{{ forloop.counter }}</span>
+          <span class="label">{{ status }}</span>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  {% if order.status != 'Cancelled' and order.status != 'Delivered' %}
+  <form method="post" action="{% url 'cancel_order' order.id %}" onsubmit="return confirm('Are you sure you want to cancel this order?');" aria-label="Cancel order form">
+    {% csrf_token %}
+    <button type="submit" class="cancel-btn">Cancel Order</button>
+  </form>
+  {% endif %}
+
+  <section class="order-info" aria-labelledby="shipping-info-heading">
+    <h3 id="shipping-info-heading">Shipping Information</h3>
+    <p><strong>Name:</strong> {{ order.shipping_full_name }}</p>
+    <p><strong>Email:</strong> {{ order.shipping_email }}</p>
+    <p><strong>Phone:</strong> {{ order.shipping_phone }}</p>
+    <p><strong>Address:</strong>
+      {{ order.shipping_address_line }},
+      {% if order.shipping_landmark %}{{ order.shipping_landmark }}, {% endif %}
+      {{ order.shipping_city }},
+      {{ order.shipping_state }},
+      {{ order.shipping_postal_code }},
+      {{ order.shipping_country }}
+    </p>
+  </section>
+
+  <section class="order-items" aria-labelledby="order-items-heading">
+    <h4 id="order-items-heading">Order Items</h4>
+    <table role="table" aria-describedby="total-amount">
+      <thead>
+        <tr>
+          <th scope="col">Product</th>
+          <th scope="col">Image</th>
+          <th scope="col">Qty</th>
+          <th scope="col">Price</th>
+          <th scope="col">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in order_items %}
+          <tr>
+            <td>{{ item.product.name }}</td>
+            <td>
+              {% with item.product.images.first as img %}
+                {% if img %}
+                  <img src="{{ img.image.url }}" alt="{{ item.product.name }} thumbnail" loading="lazy" />
+                {% else %}
+                  <img src="{% static 'images/no-image.png' %}" alt="No image available" />
+                {% endif %}
+              {% endwith %}
+            </td>
+            <td aria-label="Quantity">{{ item.quantity }}</td>
+            <td aria-label="Price">{{ item.price }}</td>
+            <td aria-label="Subtotal">{{ item.price|multiply:item.quantity }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p id="total-amount">Total Amount: {{ order.total_amount }}</p>
+  </section>
+</div>
+
+{% endblock %}

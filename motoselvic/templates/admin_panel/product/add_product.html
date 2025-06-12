@@ -1,0 +1,204 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% block title %}Add Product{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Add New Product</h2>
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row g-3">
+
+        <!-- Product Name -->
+        <div class="col-md-6">
+            <label class="form-label">Product Name</label>
+            <input type="text" class="form-control" name="name" required>
+        </div>
+
+        <!-- Manufacturer -->
+        <div class="col-md-6">
+            <label class="form-label">Manufacturer</label>
+            <select class="form-select" name="manufacturer" required>
+                {% for m in manufacturers %}
+                    <option value="{{ m.id }}">{{ m.manufacturer_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Description -->
+        <div class="col-12">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" name="description" rows="3" required></textarea>
+        </div>
+
+        <!-- Category -->
+        <div class="col-md-6">
+            <label class="form-label">Category</label>
+            <select class="form-select" name="category" id="categorySelect" required>
+                <option value="">Select Category</option>
+                {% for cat in categories %}
+                    <option value="{{ cat.id }}">{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Subcategory -->
+        <div class="col-md-6">
+            <label class="form-label">Subcategory</label>
+            <select class="form-select" name="subcategory" id="subcategorySelect">
+                <option value="">Select Subcategory</option>
+            </select>
+        </div>
+
+        <!-- Bike Company -->
+        <div class="col-md-6">
+            <label class="form-label">Bike Company</label>
+            <select class="form-select" name="bike_company" id="bikeCompanySelect">
+                <option value="">Select Company</option>
+                {% for c in bike_companies %}
+                    <option value="{{ c.name }}">{{ c.name }}</option>  {# use company name string #}
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Bike Model -->
+        <div class="col-md-6">
+            <label class="form-label">Bike Model</label>
+            <select class="form-select" name="bike_model" id="bikeModelSelect" disabled>
+                <option value="">Select Bike</option>
+                {% for b in bike_models %}
+                    <option value="{{ b.id }}" data-company="{{ b.company_name.name }}">{{ b }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Sizes -->
+        <div class="col-md-6">
+            <label class="form-label">Sizes</label>
+            <select class="form-select" name="sizes" multiple>
+                {% for size in sizes %}
+                    <option value="{{ size.id }}">{{ size.size }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Colors -->
+        <div class="col-md-6">
+            <label class="form-label">Colors</label>
+            <select class="form-select" name="colors" multiple>
+                {% for color in colors %}
+                    <option value="{{ color.id }}">{{ color.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- MRP -->
+        <div class="col-md-4">
+            <label class="form-label">MRP</label>
+            <input type="number" step="0.01" class="form-control" name="mrp" required>
+        </div>
+
+        <!-- Price -->
+        <div class="col-md-4">
+            <label class="form-label">Price (optional)</label>
+            <input type="number" step="0.01" class="form-control" name="price">
+        </div>
+
+        <!-- Stock -->
+        <div class="col-md-4">
+            <label class="form-label">Stock</label>
+            <input type="number" class="form-control" name="stock" required>
+        </div>
+
+        <!-- Product Images -->
+        <div class="col-md-6">
+            <label class="form-label">Product Images</label>
+            <input type="file" class="form-control" name="product_images" multiple accept="image/*">
+        </div>
+
+        <!-- Checkboxes -->
+        <div class="col-12">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="is_trending" id="trending">
+                <label class="form-check-label" for="trending">Trending</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="is_newarrived" id="newarrived" checked>
+                <label class="form-check-label" for="newarrived">New Arrival</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="is_active" id="active" checked>
+                <label class="form-check-label" for="active">Active</label>
+            </div>
+        </div>
+
+        <!-- Submit -->
+        <div class="col-12 mt-3">
+            <button type="submit" class="btn btn-primary w-100">Add Product</button>
+        </div>
+
+    </div>
+</form>
+
+<!-- Subcategory AJAX -->
+<script>
+    const getSubcategoriesUrl = "{% url 'get_subcategories' 0 %}".slice(0, -2);
+
+    document.getElementById('categorySelect').addEventListener('change', function () {
+        const categoryId = this.value;
+        const subcategorySelect = document.getElementById('subcategorySelect');
+        subcategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
+
+        if (!categoryId) return;
+
+        fetch(`${getSubcategoriesUrl}${categoryId}/`)
+            .then(resp => resp.json())
+            .then(data => {
+                data.subcategories.forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub.id;
+                    option.textContent = sub.sub_category_name;
+                    subcategorySelect.appendChild(option);
+                });
+            })
+            .catch(err => console.error('Error loading subcategories:', err));
+    });
+</script>
+
+<!-- Bike Model filtering by Company -->
+<script>
+    const bikeCompanySelect = document.getElementById('bikeCompanySelect');
+    const bikeModelSelect = document.getElementById('bikeModelSelect');
+
+    bikeCompanySelect.addEventListener('change', () => {
+        const selectedCompany = bikeCompanySelect.value;
+
+        if (!selectedCompany) {
+            bikeModelSelect.value = "";
+            bikeModelSelect.disabled = true;
+            for (const option of bikeModelSelect.options) {
+                option.hidden = false;
+                option.disabled = false;
+            }
+            return;
+        }
+
+        bikeModelSelect.disabled = false;
+
+        for (const option of bikeModelSelect.options) {
+            if (!option.value) continue;  // skip placeholder option
+
+            const optionCompany = option.getAttribute('data-company');
+            const matches = optionCompany === selectedCompany;
+            option.hidden = !matches;
+            option.disabled = !matches;
+        }
+
+        if (bikeModelSelect.selectedOptions.length > 0 && bikeModelSelect.selectedOptions[0].hidden) {
+            bikeModelSelect.value = "";
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        bikeModelSelect.disabled = true;
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Motoselvic - Home{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+
+<!-- === Brand Logos Scroll Section === -->
+<div class="scroll-wrapper">
+  <button class="scroll-btn left" onclick="scrollLeft('brand-scroll')">&#8249;</button>
+  <!-- Brands Section -->
+<div class="brands">
+  <div class="brand-scroll">
+    {% for company in companies %}
+      <a href="?brand={{ company.name }}" class="brand">
+        {% if company.logo %}
+          <img src="{{ company.logo.url }}" alt="{{ company.name }}">
+        {% else %}
+          <img src="{% static 'images/Our_Logos/default_logo.png' %}" alt="{{ company.name }}">
+        {% endif %}
+      </a>
+    {% endfor %}
+  </div>
+</div>
+
+  <button class="scroll-btn right" onclick="scrollRight('brand-scroll')">&#8250;</button>
+</div>
+
+
+
+<!-- === Selected Brand Products === -->
+{% if selected_brand %}
+<div class="section">
+  <h3>Products for {{ selected_brand }}</h3>
+  <div class="scroll-wrapper">
+    <button class="scroll-btn left" onclick="scrollLeft('brand-products')">&#8249;</button>
+    <div class="products scroll-content" id="brand-products">
+      {% for product in filtered_products|slice:":5" %}
+      <div class="product-card">
+        {% with main_image=product.get_main_image %}
+          {% if main_image %}
+            <img src="{{ main_image.image.url }}" alt="{{ product.name }}">
+          {% else %}
+            <img src="{% static 'images/bikes/default_bike.png' %}" alt="{{ product.name }}">
+          {% endif %}
+        {% endwith %}
+        <h4>{{ product.name }}</h4>
+        <p>₹{{ product.price }}</p>
+        <a href="{% url 'product_detail' product.id %}" class="btn">View Details</a>
+      </div>
+      {% endfor %}
+    </div>
+    <button class="scroll-btn right" onclick="scrollRight('brand-products')">&#8250;</button>
+  </div>
+</div>
+{% endif %}
+
+<!-- === Trending Products === -->
+<div class="section">
+  <h3>Trending Products</h3>
+  <div class="scroll-wrapper">
+    <button class="scroll-btn left" onclick="scrollLeft('trending-scroll')">&#8249;</button>
+    <div class="products scroll-content" id="trending-scroll">
+      {% for product in trending_products|slice:":5" %}
+      <div class="product-card">
+        {% with main_image=product.get_main_image %}
+          {% if main_image %}
+            <img src="{{ main_image.image.url }}" alt="{{ product.name }}">
+          {% else %}
+            <img src="{% static 'images/bikes/default_bike.png' %}" alt="{{ product.name }}">
+          {% endif %}
+        {% endwith %}
+        <h4>{{ product.name }}</h4>
+        <p>₹{{ product.price }}</p>
+        <a href="{% url 'product_detail' product.id %}" class="btn">View Details</a>
+      </div>
+      {% endfor %}
+    </div>
+    <button class="scroll-btn right" onclick="scrollRight('trending-scroll')">&#8250;</button>
+  </div>
+</div>
+
+<!-- === New Arrivals === -->
+<div class="section">
+  <h3>New Arrivals</h3>
+  <div class="scroll-wrapper">
+    <button class="scroll-btn left" onclick="scrollLeft('new-scroll')">&#8249;</button>
+    <div class="products scroll-content" id="new-scroll">
+      {% for product in new_arrivals|slice:":5" %}
+      <div class="product-card">
+        {% with main_image=product.get_main_image %}
+          {% if main_image %}
+            <img src="{{ main_image.image.url }}" alt="{{ product.name }}">
+          {% else %}
+            <img src="{% static 'images/bikes/default_bike.png' %}" alt="{{ product.name }}">
+          {% endif %}
+        {% endwith %}
+        <h4>{{ product.name }}</h4>
+        <p>₹{{ product.price }}</p>
+        <a href="{% url 'product_detail' product.id %}" class="btn">View Details</a>
+      </div>
+      {% endfor %}
+    </div>
+    <button class="scroll-btn right" onclick="scrollRight('new-scroll')">&#8250;</button>
+  </div>
+</div>
+
+<!-- === Recommended Products === -->
+{% if recommended_products %}
+<div class="section">
+  <h3>Recommended for You</h3>
+  <div class="scroll-wrapper">
+    <button class="scroll-btn left" onclick="scrollLeft('recommend-scroll')">&#8249;</button>
+    <div class="products scroll-content" id="recommend-scroll">
+      {% for product in recommended_products|slice:":5" %}
+      <div class="product-card">
+        {% with main_image=product.get_main_image %}
+          {% if main_image %}
+            <img src="{{ main_image.image.url }}" alt="{{ product.name }}">
+          {% else %}
+            <img src="{% static 'images/bikes/default_bike.png' %}" alt="{{ product.name }}">
+          {% endif %}
+        {% endwith %}
+        <h4>{{ product.name }}</h4>
+        <p>₹{{ product.price }}</p>
+        <a href="{% url 'product_detail' product.id %}" class="btn">View Details</a>
+      </div>
+      {% endfor %}
+    </div>
+    <button class="scroll-btn right" onclick="scrollRight('recommend-scroll')">&#8250;</button>
+  </div>
+</div>
+{% endif %}
+
+<!-- === Related Products === -->
+{% if related_products %}
+<div class="section">
+  <h3>Products for {{ related_products.0.bike_model }}</h3>
+  <div class="scroll-wrapper">
+    <button class="scroll-btn left" onclick="scrollLeft('related-scroll')">&#8249;</button>
+    <div class="products scroll-content" id="related-scroll">
+      {% for product in related_products|slice:":5" %}
+      <div class="product-card">
+        {% with main_image=product.get_main_image %}
+          {% if main_image %}
+            <img src="{{ main_image.image.url }}" alt="{{ product.name }}">
+          {% else %}
+            <img src="{% static 'images/bikes/default_bike.png' %}" alt="{{ product.name }}">
+          {% endif %}
+        {% endwith %}
+        <h4>{{ product.name }}</h4>
+        <p>₹{{ product.price }}</p>
+        <a href="{% url 'product_detail' product.id %}" class="btn">View Details</a>
+      </div>
+      {% endfor %}
+    </div>
+    <button class="scroll-btn right" onclick="scrollRight('related-scroll')">&#8250;</button>
+  </div>
+</div>
+{% endif %}
+
+<!-- Scroll Script -->
+<script>
+  function scrollLeft(id) {
+    const container = document.getElementById(id);
+    container.scrollBy({ left: -container.offsetWidth, behavior: 'smooth' });
+  }
+
+  function scrollRight(id) {
+    const container = document.getElementById(id);
+    container.scrollBy({ left: container.offsetWidth, behavior: 'smooth' });
+  }
+</script>
+
+
+{% endblock %}

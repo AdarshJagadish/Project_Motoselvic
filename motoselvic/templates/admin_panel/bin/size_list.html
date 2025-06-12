@@ -1,0 +1,33 @@
+<!-- templates/admin_panel/size/manage_sizes.html -->
+{% include 'admin_panel/admin_base.html' %}
+
+<div class="container mt-5 text-white">
+    <h2 class="mb-4 text-danger">Manage Product Sizes</h2>
+    <a href="{% url 'admin_add_size' %}" class="btn btn-danger mb-3">Add New Size</a>
+    
+    {% if sizes %}
+    <table class="table table-dark table-bordered table-hover">
+        <thead class="bg-danger text-white">
+            <tr>
+                <th>#</th>
+                <th>Size</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for size in sizes %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ size.size }}</td>
+                <td>
+                    <a href="{% url 'admin_edit_size' size.id %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'admin_delete_size' size.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this size?');">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-info">No sizes added yet.</div>
+    {% endif %}
+</div>

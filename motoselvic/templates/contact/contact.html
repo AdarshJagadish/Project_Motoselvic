@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us | Motoselvic{% endblock %}
+
+{% block content %}
+<!-- Flash Messages -->
+<div class="container mt-4" data-aos="fade-down">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<!-- Contact Section -->
+<div class="container py-5" data-aos="fade-up">
+    <h2 class="text-center mb-4 fw-bold text-light">Get in Touch</h2>
+    <div class="row g-5">
+        <!-- Contact Form -->
+        <div class="col-lg-6">
+            <div class="p-4 bg-dark rounded-4 shadow-lg border border-secondary">
+                <h4 class="text-danger mb-4">Send a Message</h4>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="name" class="form-label text-light">Your Name</label>
+                        <input type="text" class="form-control bg-light text-dark" id="name" name="name" placeholder="John Doe" value="{{ request.POST.name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label text-light">Email Address</label>
+                        <input type="email" class="form-control bg-light text-dark" id="email" name="email" placeholder="you@example.com" value="{{ request.POST.email }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label text-light">Your Message</label>
+                        <textarea class="form-control bg-light text-dark" id="message" name="message" rows="5" placeholder="Write your message here..." required>{{ request.POST.message }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100">Send Message</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="col-lg-6">
+            <div class="p-4 bg-dark rounded-4 shadow-lg border border-secondary">
+                <h4 class="text-danger mb-3">Our Office</h4>
+                <p class="text-light mb-2"><i class="bi bi-geo-alt-fill text-danger me-2"></i>Thrissur, Kerala, India</p>
+                <p class="text-light"><i class="bi bi-telephone-fill text-danger me-2"></i>+91 98466 75300</p>
+                <div class="mt-4 rounded-3 overflow-hidden">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d125531.65889000554!2d76.06734900255582!3d10.511349555132526!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba7ee15ed42d1bb%3A0x82e45aa016ca7db!2sThrissur%2C%20Kerala!5e0!3m2!1sen!2sin!4v1746101344511!5m2!1sen!2sin"
+                        width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
